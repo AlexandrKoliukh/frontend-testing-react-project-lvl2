@@ -1,0 +1,38 @@
+{
+    "name": "@hexlet/code",
+    "version": "1.0.0",
+    "description": "Testing TODO",
+    "engines": {
+        "node": "14.x"
+    },
+    "author": "Aleksandr Koliukh",
+    "license": "ISC",
+    "scripts": {
+        "start": "npx @hexlet/react-todo-app-with-backend",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "lint": "eslint . --fix"
+    },
+    "dependencies": {
+        "@hexlet/react-todo-app-with-backend": "^0.10.0",
+        "msw": "^0.29.0",
+        "react": "^17.0.2"
+    },
+    "devDependencies": {
+        "@testing-library/jest-dom": "^5.13.0",
+        "@babel/core": "^7.14.3",
+        "@babel/eslint-parser": "^7.14.4",
+        "@babel/preset-env": "^7.14.4",
+        "@babel/preset-react": "^7.13.13",
+        "@testing-library/react": "^11.2.7",
+        "@testing-library/user-event": "^13.1.9",
+        "babel-jest": "^27.0.2",
+        "eslint": "^7.28.0",
+        "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-plugin-jest": "^24.3.6",
+        "eslint-plugin-prettier": "^3.4.0",
+        "faker": "^5.5.3",
+        "jest": "^27.0.4",
+        "prettier": "^2.2.1"
+    }
+}
