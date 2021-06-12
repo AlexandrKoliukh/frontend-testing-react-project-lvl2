@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { nanoid } from 'nanoid';

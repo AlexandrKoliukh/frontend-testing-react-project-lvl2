@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { test, expect } from '@jest/globals';
 import initApp from '@hexlet/react-todo-app-with-backend';
 import { render, screen, waitFor, within } from '@testing-library/react';
