@@ -12,6 +12,7 @@ env:
 extends:
   - 'airbnb-base'
   - 'plugin:jest/recommended'
+  - 'plugin:prettier/recommended'
 
 parserOptions:
   ecmaVersion: 11
@@ -20,4 +21,7 @@ parserOptions:
 rules:
   no-console: 0
   import/extensions: 0 # FIXME: remove when rule will be adjusted for new nodejs version
+  import/prefer-default-export: 0
+  implicit-arrow-linebreak: 0
+  jest/no-mocks-import: 0
   no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]

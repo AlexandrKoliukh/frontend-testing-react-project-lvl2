@@ -9,7 +9,7 @@
     "license": "ISC",
     "scripts": {
         "start": "npx @hexlet/react-todo-app-with-backend",
-        "test": "jest",
+        "test": "jest --bail",
         "test:watch": "jest --watch",
         "lint": "eslint . --fix"
     },
@@ -17,6 +17,7 @@
         "@hexlet/react-todo-app-with-backend": "^0.10.0",
         "@jest/globals": "^27.0.3",
         "@testing-library/jest-dom": "^5.13.0",
+        "nanoid": "^3.1.23",
         "react": "^17.0.2"
     },
     "devDependencies": {
@@ -29,8 +30,10 @@
         "babel-jest": "^27.0.2",
         "eslint": "^7.28.0",
         "eslint-config-airbnb-base": "^14.2.1",
+        "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-import": "^2.23.4",
         "eslint-plugin-jest": "^24.3.6",
+        "eslint-plugin-prettier": "^3.4.0",
         "faker": "^5.5.3",
         "jest": "^27.0.4",
         "msw": "^0.29.0",
