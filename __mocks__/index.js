@@ -9,12 +9,12 @@ export const runServer = () => {
 
   const handlers = [
     rest.post(makeRoute('lists'), (req, res, ctx) => {
-      const list = { id: nanoid(), name: req.body.name, removable: true };
+      const list = { id: 2, name: req.body.name, removable: true };
       return res(ctx.json(list));
     }),
 
     rest.delete(makeRoute('lists', ':id'), (req, res, ctx) => {
-      res(ctx.status(204));
+      return res(ctx.status(204));
     }),
 
     rest.post(makeRoute('lists', ':id', 'tasks'), (req, res, ctx) => {
