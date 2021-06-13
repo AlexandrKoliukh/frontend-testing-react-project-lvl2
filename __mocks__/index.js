@@ -1,49 +1,43 @@
 /* eslint-disable */
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import { nanoid } from 'nanoid';
+import State from '../__fixtures__/State';
 
 export const runServer = () => {
   const prefix = 'http://localhost/api/v1';
 
   const makeRoute = (...paths) => `${prefix}/${paths.join('/')}`;
 
+  const state = new State();
+
   const handlers = [
     rest.post(makeRoute('lists'), (req, res, ctx) => {
-      const list = { id: 2, name: req.body.name, removable: true };
+      const list = state.creteList(req.body.name);
       return res(ctx.json(list));
     }),
 
     rest.delete(makeRoute('lists', ':id'), (req, res, ctx) => {
+      state.deleteList(req.params.id);
       return res(ctx.status(204));
     }),
 
     rest.post(makeRoute('lists', ':id', 'tasks'), (req, res, ctx) => {
-      const task = {
-        id: nanoid(),
-        listId: Number(req.params.id),
-        text: req.body.text,
-        completed: false,
-      };
-
+      const task = state.createTask(req.params.id, req.body.text);
       return res(ctx.json(task));
     }),
 
     rest.patch(makeRoute('tasks', ':id'), (req, res, ctx) => {
-      const task = {
-        id: Number(req.params.id),
-        listId: 1,
-        text: req.body.text,
+      const task = state.updateTask(req.params.id, {
         completed: req.body.completed,
-      };
-
+      });
       return res(ctx.json(task));
     }),
 
-    rest.delete(makeRoute('tasks', ':id'), (req, res, ctx) =>
-      res(ctx.status(204))
-    ),
+    rest.delete(makeRoute('tasks', ':id'), (req, res, ctx) => {
+      state.deleteTask(req.params.id);
+      return res(ctx.status(204));
+    }),
   ];
 
-  return setupServer(...handlers);
+  return { server: setupServer(...handlers), initialState: state.valueOf() };
 };

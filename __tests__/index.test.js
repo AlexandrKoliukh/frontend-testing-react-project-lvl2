@@ -7,18 +7,15 @@ import { runServer } from '../__mocks__';
 
 let server;
 
-beforeAll(() => {
-  server = runServer();
+beforeEach(() => {
+  const initial = runServer();
+  server = initial.server;
   server.listen();
-});
 
-beforeEach(() => {});
+  render(initApp(initial.initialState));
+});
 
 afterEach(() => {
-  server.resetHandlers();
-});
-
-afterAll(() => {
   server.close();
 });
 
@@ -36,30 +33,12 @@ const createTask = async (name) => {
   await userEvent.click(within(form).getByRole('button'));
 };
 
-const initialState = {
-  currentListId: 1,
-  lists: [
-    { id: 1, name: 'Initial list', removable: false },
-    { id: 2, name: 'Second list', removable: true },
-  ],
-  tasks: [
-    { id: 1, listId: 1, text: 'task1', completed: false },
-    { id: 2, listId: 1, text: 'task2', completed: false },
-    { id: 3, listId: 2, text: 'task3', completed: false },
-    { id: 4, listId: 2, text: 'task4', completed: false },
-    { id: 5, listId: 2, text: 'task5', completed: false },
-  ],
-};
-
-test('index', () => {
-  render(initApp(initialState));
-  expect(screen.getByText('Hexlet Todos')).toBeInTheDocument();
+test('index', async () => {
+  expect(screen.getByText('Hexlet Todos')).toBeVisible();
 });
 
 describe('Tasks', () => {
   it('Creating', async () => {
-    await render(initApp({ ...initialState, tasks: [] }));
-
     await createTask('task1');
     await waitFor(async () => {
       const ul = screen.getByTestId('tasks');
@@ -80,10 +59,8 @@ describe('Tasks', () => {
   });
 
   it('Patching', async () => {
-    await render(initApp(initialState));
-
-    const task1 = await screen.getByLabelText('task1');
-    const task2 = await screen.getByLabelText('task2');
+    const task1 = await screen.getByLabelText('First');
+    const task2 = await screen.getByLabelText('Second');
 
     userEvent.click(task1);
     await waitFor(() => {
@@ -105,8 +82,6 @@ describe('Tasks', () => {
   });
 
   it('Deleting', async () => {
-    await render(initApp(initialState));
-
     const ul = screen.getByTestId('tasks');
     const buttons = await within(ul).getAllByRole('button', {
       name: 'Remove',
@@ -114,86 +89,88 @@ describe('Tasks', () => {
 
     await waitFor(() => {
       expect(buttons).toHaveLength(2);
-
-      expect(within(ul).queryByText('task1')).toBeInTheDocument();
-      expect(within(ul).queryByText('task2')).toBeInTheDocument();
+      expect(within(ul).queryByText('First')).toBeInTheDocument();
+      expect(within(ul).queryByText('Second')).toBeInTheDocument();
     });
 
     userEvent.click(buttons[0]);
-
     await waitFor(() => {
-      expect(within(ul).queryByText('task1')).not.toBeInTheDocument();
-      expect(within(ul).queryByText('task2')).toBeInTheDocument();
+      expect(within(ul).queryByText('First')).not.toBeInTheDocument();
+      expect(within(ul).queryByText('Second')).toBeInTheDocument();
     });
   });
 });
 
 describe('Lists', () => {
   it('Creating', async () => {
-    await render(
-      initApp({
-        ...initialState,
-        lists: [{ id: 1, name: 'Initial list', removable: false }],
-      })
-    );
-
-    const lists = await screen.getByTestId('lists');
-    const tasks = await screen.getByTestId('tasks');
-
     await waitFor(async () => {
+      const lists = await screen.getByTestId('lists');
       expect(
         await within(lists).findByText('Initial list')
       ).toBeInTheDocument();
-      expect(await within(lists).getAllByRole('listitem')).toHaveLength(1);
+      expect(await within(lists).getAllByRole('listitem')).toHaveLength(2);
     });
 
     await createList('list1');
     await waitFor(async () => {
-      expect(await within(lists).getAllByRole('listitem')).toHaveLength(2);
+      const lists = await screen.getByTestId('lists');
+      expect(await within(lists).getAllByRole('listitem')).toHaveLength(3);
       expect(await within(lists).findByText('list1')).toBeInTheDocument();
-      expect(await within(tasks).getAllByRole('listitem')).toHaveLength(3);
+      expect(screen.queryByTestId('tasks')).not.toBeInTheDocument();
+      expect(screen.getByText('Tasks list is empty')).toBeVisible();
+    });
+
+    await createTask('task1');
+    await waitFor(async () => {
+      expect(screen.queryByText('task1')).toBeVisible();
+    });
+
+    await createTask('task2');
+    await waitFor(async () => {
+      const tasks = await screen.getByTestId('tasks');
+      expect(await within(tasks).getAllByRole('listitem')).toHaveLength(2);
+      expect(screen.queryByText('task1')).toBeVisible();
+      expect(screen.queryByText('task2')).toBeVisible();
     });
 
     await userEvent.click(screen.getByRole('button', { name: 'Initial list' }));
-
     await waitFor(async () => {
-      expect(await within(tasks).getAllByRole('listitem')).toHaveLength(2);
+      expect(screen.queryByText('task1')).not.toBeInTheDocument();
+      expect(screen.queryByText('task2')).not.toBeInTheDocument();
     });
 
     await createList('list1');
-    await createList('list1');
-    await createList('list1');
     await waitFor(async () => {
-      expect(await within(lists).getAllByRole('listitem')).toHaveLength(2);
+      const lists = await screen.getByTestId('lists');
+      expect(await within(lists).getAllByText('list1')).toHaveLength(1);
     });
 
     await userEvent.click(screen.getByRole('button', { name: 'list1' }));
     await waitFor(async () => {
-      expect(await within(tasks).getAllByRole('listitem')).toHaveLength(3);
+      const tasks = await screen.getByTestId('tasks');
+
+      expect(await within(tasks).getAllByRole('listitem')).toHaveLength(2);
+      expect(screen.queryByText('task1')).toBeVisible();
+      expect(screen.queryByText('task2')).toBeVisible();
     });
   });
 
   it('Deleting', async () => {
-    await render(initApp(initialState));
-    const lists = await screen.getByTestId('lists');
+    await waitFor(async () => {
+      const lists = await screen.getByTestId('lists');
+      expect(await within(lists).getAllByRole('listitem')).toHaveLength(2);
+    });
 
-    expect(await within(lists).getAllByRole('listitem')).toHaveLength(2);
-
-    await userEvent.click(
-      within(lists).getByRole('button', { name: 'Second list' })
-    );
+    await userEvent.click(screen.getByRole('button', { name: 'Second list' }));
     await waitFor(async () => {
       const tasks = await screen.getByTestId('tasks');
-
       expect(await within(tasks).getAllByRole('listitem')).toHaveLength(3);
     });
 
-    await userEvent.click(
-      within(lists).getByRole('button', { name: 'remove list' })
-    );
-
+    await userEvent.click(screen.getByRole('button', { name: 'remove list' }));
     await waitFor(async () => {
       const tasks = await screen.getByTestId('tasks');
+      const lists = await screen.getByTestId('lists');
 
       expect(within(tasks).getAllByRole('listitem')).toHaveLength(2);
       expect(within(lists).getAllByRole('listitem')).toHaveLength(1);
