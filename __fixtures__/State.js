@@ -1,3 +1,4 @@
+/* eslint-disable object-curly-newline,comma-dangle */
 export default class State {
   constructor(state) {
     if (state) {
