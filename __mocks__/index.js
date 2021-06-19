@@ -76,16 +76,19 @@ export const runServer = (initialState) => {
   const handlers = [
     rest.post(makeRoute('lists'), (req, res, ctx) => {
       const list = state.creteList(req.body.name);
+      ctx.delay();
       return res(ctx.json(list));
     }),
 
     rest.delete(makeRoute('lists', ':id'), (req, res, ctx) => {
       state.deleteList(req.params.id);
+      ctx.delay();
       return res(ctx.status(204));
     }),
 
     rest.post(makeRoute('lists', ':id', 'tasks'), (req, res, ctx) => {
       const task = state.createTask(req.params.id, req.body.text);
+      ctx.delay();
       return res(ctx.json(task));
     }),
 
@@ -93,11 +96,13 @@ export const runServer = (initialState) => {
       const task = state.updateTask(req.params.id, {
         completed: req.body.completed,
       });
+      ctx.delay();
       return res(ctx.json(task));
     }),
 
     rest.delete(makeRoute('tasks', ':id'), (req, res, ctx) => {
       state.deleteTask(req.params.id);
+      ctx.delay();
       return res(ctx.status(204));
     }),
   ];

@@ -4,6 +4,7 @@ import initApp from '@hexlet/react-todo-app-with-backend';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { runServer } from '../__mocks__';
+import { rest } from 'msw';
 
 let server;
 
@@ -59,7 +60,7 @@ describe('Tasks', () => {
     userEvent.type(input, 'task1');
     userEvent.click(submit);
 
-    expect(input.hasAttribute('readOnly')).toBe(true);
+    expect(input).toHaveAttribute('readonly');
     expect(submit).toBeDisabled();
 
     await waitFor(() => {
@@ -67,7 +68,7 @@ describe('Tasks', () => {
       expect(within(ul).getByText('task1')).toBeInTheDocument();
     });
 
-    expect(input.hasAttribute('readOnly')).toBe(false);
+    expect(input).not.toHaveAttribute('readonly');
     expect(submit).toBeEnabled();
 
     userEvent.type(input, 'task2');
@@ -148,6 +149,21 @@ describe('Tasks', () => {
     });
     expect(within(ul).queryByText('Second')).toBeInTheDocument();
   });
+
+  it('Error', async () => {
+    server.use(
+      rest.post('/api/v1/lists/:id/tasks', (req, res, ctx) =>
+        res(ctx.status(500))
+      )
+    );
+
+    createTask('task1');
+
+    await waitFor(() =>
+      expect(screen.queryByText(/network error/i)).toBeVisible()
+    );
+    expect(screen.queryByText('task1')).not.toBeInTheDocument();
+  });
 });
 
 describe('Lists', () => {
@@ -162,7 +178,7 @@ describe('Lists', () => {
 
     userEvent.type(input, 'list1');
     userEvent.click(submit);
-    expect(input.hasAttribute('readOnly')).toBe(true);
+    expect(input).toHaveAttribute('readonly');
     expect(submit).toBeDisabled();
 
     await waitFor(() => {
@@ -221,5 +237,18 @@ describe('Lists', () => {
     expect(
       within(screen.getByTestId('tasks')).getAllByRole('listitem')
     ).toHaveLength(2);
+  });
+
+  it('Error', async () => {
+    server.use(
+      rest.post('/api/v1/lists', (req, res, ctx) => res(ctx.status(500)))
+    );
+
+    createList('list1');
+
+    await waitFor(() =>
+      expect(screen.queryByText(/network error/i)).toBeVisible()
+    );
+    expect(screen.queryByText('list1')).not.toBeInTheDocument();
   });
 });
