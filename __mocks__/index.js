@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
+import { uniqueId } from 'lodash';
 
 class State {
   constructor(state) {
@@ -54,11 +55,11 @@ class State {
   }
 
   getNextTaskId() {
-    return this.state.tasks[this.state.tasks.length - 1].id + 1 || 1;
+    return Number(uniqueId('1'));
   }
 
   getNextListId() {
-    return this.state.lists[this.state.lists.length - 1].id + 1 || 1;
+    return Number(uniqueId('1'));
   }
 
   valueOf() {

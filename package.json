@@ -16,7 +16,8 @@
     "dependencies": {
         "@hexlet/react-todo-app-with-backend": "^0.10.0",
         "@jest/globals": "^27.0.3",
-        "@testing-library/jest-dom": "^5.13.0"
+        "@testing-library/jest-dom": "^5.13.0",
+        "lodash": "^4.17.21"
     },
     "devDependencies": {
         "@babel/core": "^7.14.3",
